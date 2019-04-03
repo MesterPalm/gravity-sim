@@ -12,13 +12,19 @@ PLANET_SCALE = 2
 
 #colors
 white = (255,255,255)
-red = (255,0,0)
-green = (0,255,0)
-blue = (0,0,255)
+red = (255,50,50)
+green = (50,255,50)
+blue = (50,50,255)
 darkBlue = (0,0,128)
 white = (255,255,255)
 black = (0,0,0)
 pink = (255,200,200)
+space_grey = (15,10,15)
+planet_red = (185,50,80)
+planet_green = (150, 200, 75)
+planet_blue = (20, 150, 170)
+
+
 
 #simulation settings
 GRAVITONS=0.5
@@ -60,7 +66,6 @@ class planet:
         return (direction[0]*f, direction[1]*f)
 
     def update(self, delta_time=1):
-        print(delta_time)
         delta_time = 1 if delta_time > 1 else delta_time
         time_step = delta_time*TIME_SCALE
         self.velocity[0] += time_step*self.force[0]/self.mass
@@ -69,15 +74,15 @@ class planet:
         self.pos[0] += self.velocity[0]*time_step
         self.pos[1] += self.velocity[1]*time_step
 
-planets.append(planet([SCREEN_WIDTH/4, SCREEN_HEIGHT/4], green, 20))
-planets.append(planet([3*SCREEN_WIDTH/4, 3*SCREEN_HEIGHT/4], red, 20))
+planets.append(planet([SCREEN_WIDTH/4, SCREEN_HEIGHT/4], planet_green, 20))
+planets.append(planet([3*SCREEN_WIDTH/4, 3*SCREEN_HEIGHT/4], planet_red, 20))
 planets.append(planet([SCREEN_WIDTH/4, 3*SCREEN_HEIGHT/4], pink, 20))
-planets.append(planet([3*SCREEN_WIDTH/4, SCREEN_HEIGHT/4], blue, 20))
-planets.append(planet([SCREEN_WIDTH/5, SCREEN_HEIGHT/5], green, 10))
-planets.append(planet([4*SCREEN_WIDTH/5, 4*SCREEN_HEIGHT/5], red, 10))
-planets.append(planet([4*SCREEN_WIDTH/5, SCREEN_HEIGHT/5], green, 10))
+planets.append(planet([3*SCREEN_WIDTH/4, SCREEN_HEIGHT/4], planet_blue, 20))
+planets.append(planet([SCREEN_WIDTH/5, SCREEN_HEIGHT/5], planet_green, 10))
+planets.append(planet([4*SCREEN_WIDTH/5, 4*SCREEN_HEIGHT/5], planet_red, 10))
+planets.append(planet([4*SCREEN_WIDTH/5, SCREEN_HEIGHT/5], planet_green, 10))
 planets.append(planet([SCREEN_WIDTH/5, 4*SCREEN_HEIGHT/5], red, 10))
-planets.append(planet([SCREEN_WIDTH/2, SCREEN_HEIGHT/2], blue, 10000))
+planets.append(planet([SCREEN_WIDTH/2, SCREEN_HEIGHT/2], planet_blue, 10000))
 planets[0].add_force([4,-4])
 planets[1].add_force([-4,4])
 planets[2].add_force([2,-4])
@@ -103,9 +108,8 @@ while (playin):
         for planet in planets:
             planet.update(delta_time)
     #drawing
-    screen.fill(darkBlue)
+    screen.fill(space_grey)
     for planet in planets:
-        print(screen, planet.color, (int(planet.pos[0]), int(planet.pos[1])), int(PLANET_SCALE*(planet.mass)**(1/3)))
         pygame.draw.circle(screen, planet.color, (int(planet.pos[0]), int(planet.pos[1])), int(PLANET_SCALE*(planet.mass)**(1/3)))
 
     #sleep(0.01)
