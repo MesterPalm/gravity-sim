@@ -5,7 +5,7 @@ import os
 
 ##SETTING VARS
 #display settings
-SCALE = 3
+SCALE = 1.5
 SCREEN_WIDTH = 640*SCALE
 SCREEN_HEIGHT = 480*SCALE
 PLANET_SCALE = 2
@@ -32,17 +32,20 @@ TIME_SCALE = 10
 
 ##SETTUP
 pygame.init()
-screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT), pygame.RESIZABLE)
+screen = pygame.display.set_mode((int(SCREEN_WIDTH),int(SCREEN_HEIGHT)), pygame.RESIZABLE)
 playin = True
 log = {}
 pause = False
 step = False
+draw_offset = [0,0]
+draw_scale = 1
+button_held = False
 
 planets = []
 clear = lambda: os.system('clear')
 curr_time = 0
-
-
+mouse_pos= pygame.mouse.get_pos()
+scroll_scale_change = 0.1
     
 class planet:
     def __init__(self, pos, color, mass):
@@ -110,11 +113,14 @@ while (playin):
     #drawing
     screen.fill(space_grey)
     for planet in planets:
-        pygame.draw.circle(screen, planet.color, (int(planet.pos[0]), int(planet.pos[1])), int(PLANET_SCALE*(planet.mass)**(1/3)))
+        pygame.draw.circle(screen, planet.color, (int(draw_scale*(planet.pos[0]) + draw_offset[0]), int(draw_scale*(planet.pos[1]) + draw_offset[1])), int(draw_scale*PLANET_SCALE*(planet.mass)**(1/3)))
 
     #sleep(0.01)
    
     #event handling
+    prev_mouse_pos = mouse_pos
+    mouse_pos= pygame.mouse.get_pos()
+
     for event in pygame.event.get():
         log["event"] = str(event)
         if event.type == pygame.QUIT:
@@ -124,7 +130,26 @@ while (playin):
                 pause = not pause
             if event.key == pygame.K_s:
                 step = True
-            
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                button_held = True
+            if event.button == 4:
+                draw_scale = draw_scale*(1-scroll_scale_change)
+                draw_offset[0] += mouse_pos[0]*draw_scale*scroll_scale_change
+                draw_offset[1] += mouse_pos[1]*draw_scale*scroll_scale_change
+            elif event.button == 5:     
+                draw_scale = draw_scale*(1+scroll_scale_change)
+                draw_offset[0] -= mouse_pos[0]*draw_scale*scroll_scale_change
+                draw_offset[1] -= mouse_pos[1]*draw_scale*scroll_scale_change
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                button_held = False
+                
+    if button_held == True:
+        mouse_motion = [mouse_pos[0]-prev_mouse_pos[0],mouse_pos[1]-prev_mouse_pos[1]]
+        draw_offset[0] += mouse_motion[0]
+        draw_offset[1] += mouse_motion[1]
     clear()
     for key in log:
         print(log[key])
