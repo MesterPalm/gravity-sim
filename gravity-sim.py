@@ -2,13 +2,14 @@ import pygame
 import sys
 from time import sleep, perf_counter
 import os
+from math import sin, cos
 
 ##SETTING VARS
 #display settings
-SCALE = 1.5
+SCALE = 2.5
 SCREEN_WIDTH = 640*SCALE
 SCREEN_HEIGHT = 480*SCALE
-PLANET_SCALE = 2
+PLANET_SCALE = 1
 
 #colors
 white = (255,255,255)
@@ -27,7 +28,7 @@ planet_blue = (20, 150, 170)
 
 
 #simulation settings
-GRAVITONS=0.5
+GRAVITONS=0.2
 TIME_SCALE = 10
 
 ##SETTUP
@@ -77,23 +78,20 @@ class planet:
         self.pos[0] += self.velocity[0]*time_step
         self.pos[1] += self.velocity[1]*time_step
 
-planets.append(planet([SCREEN_WIDTH/4, SCREEN_HEIGHT/4], planet_green, 20))
-planets.append(planet([3*SCREEN_WIDTH/4, 3*SCREEN_HEIGHT/4], planet_red, 20))
-planets.append(planet([SCREEN_WIDTH/4, 3*SCREEN_HEIGHT/4], pink, 20))
-planets.append(planet([3*SCREEN_WIDTH/4, SCREEN_HEIGHT/4], planet_blue, 20))
-planets.append(planet([SCREEN_WIDTH/5, SCREEN_HEIGHT/5], planet_green, 10))
-planets.append(planet([4*SCREEN_WIDTH/5, 4*SCREEN_HEIGHT/5], planet_red, 10))
-planets.append(planet([4*SCREEN_WIDTH/5, SCREEN_HEIGHT/5], planet_green, 10))
-planets.append(planet([SCREEN_WIDTH/5, 4*SCREEN_HEIGHT/5], red, 10))
-planets.append(planet([SCREEN_WIDTH/2, SCREEN_HEIGHT/2], planet_blue, 10000))
-planets[0].add_force([4,-4])
-planets[1].add_force([-4,4])
-planets[2].add_force([2,-4])
-planets[3].add_force([0,4])
-planets[4].add_force([4,0])
-planets[5].add_force([-4,0])
-planets[6].add_force([0,4])
-planets[7].add_force([0,-4])
+planets.append(planet([0,0], planet_blue, 100000))
+planets.append(planet([5*SCREEN_WIDTH, 5*SCREEN_HEIGHT], planet_blue, 100000))
+planets.append(planet([2*SCREEN_WIDTH, 2*SCREEN_HEIGHT], planet_green, 1500000))
+planets[0].add_force([-40000,40000])
+planets[1].add_force([50000,-50000])
+nr =70
+start = 100
+radius = 1/200
+angle = 1
+for i in range(start,start+nr):
+    planets.append(planet([i*SCREEN_WIDTH*cos(i*angle)*radius+SCREEN_HEIGHT/3, i*SCREEN_HEIGHT*sin(i*angle)*radius+SCREEN_HEIGHT/3], [i*255/(nr+start),255,255/(i+1)], 5*(1 + (i%3))))
+for i in range(start,start+nr):
+    planets.append(planet([i*SCREEN_WIDTH*cos(i*angle)*radius+6*SCREEN_HEIGHT, i*SCREEN_HEIGHT*sin(i*angle)*radius+6*SCREEN_HEIGHT], [i*255/(nr+start),255,255/(i+1)], 5*(1 + (i%3))))
+
 ##MAIN LOOP
 while (playin):  
     prev_time = curr_time
@@ -107,6 +105,7 @@ while (playin):
             for p2 in planets:
                 if p1 != p2:
                     p1.add_force(p1.gravity_between(p2))
+                    #add normal force
     
         for planet in planets:
             planet.update(delta_time)
@@ -114,8 +113,6 @@ while (playin):
     screen.fill(space_grey)
     for planet in planets:
         pygame.draw.circle(screen, planet.color, (int(draw_scale*(planet.pos[0]) + draw_offset[0]), int(draw_scale*(planet.pos[1]) + draw_offset[1])), int(draw_scale*PLANET_SCALE*(planet.mass)**(1/3)))
-
-    #sleep(0.01)
    
     #event handling
     prev_mouse_pos = mouse_pos
@@ -135,12 +132,12 @@ while (playin):
                 button_held = True
             if event.button == 4:
                 draw_scale = draw_scale*(1-scroll_scale_change)
-                draw_offset[0] += mouse_pos[0]*draw_scale*scroll_scale_change
-                draw_offset[1] += mouse_pos[1]*draw_scale*scroll_scale_change
+                draw_offset[0] += mouse_pos[0]*scroll_scale_change
+                draw_offset[1] += mouse_pos[1]*scroll_scale_change
             elif event.button == 5:     
                 draw_scale = draw_scale*(1+scroll_scale_change)
-                draw_offset[0] -= mouse_pos[0]*draw_scale*scroll_scale_change
-                draw_offset[1] -= mouse_pos[1]*draw_scale*scroll_scale_change
+                draw_offset[0] -= mouse_pos[0]*scroll_scale_change
+                draw_offset[1] -= mouse_pos[1]*scroll_scale_change
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
