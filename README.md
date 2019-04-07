@@ -2,6 +2,12 @@ Intro
 -----
 Small attempt at a physics simulation
 
+Running
+-------
+Run the program simply with a Python3 interpreter
+
+`python3 gravity-sim.py`
+
 Depedencies
 -----------
 * Only runs with Python3 or higher
